@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOMINION | Karna The Mangaka</title>
+    <style>
+        /* === CORE VARIABLES === */
+        :root {
+            --bg-color: #050505; 
+            --surface: #121212;
+            --accent: #ff2a5f; 
+            --accent-glow: rgba(255, 42, 95, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-main);
+        }
+
+        body, html {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            height: 100%;
+            cursor: default; /* Prep for custom glow */
+        }
+
+        /* === PREMIUM MOUSE TRACKER === */
+        #cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 42, 95, 0.12) 0%, rgba(0,0,0,0) 60%);
+            border-radius: 50%;
+            pointer-events: none; /* Let clicks pass through */
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            mix-blend-mode: screen;
+        }
+
+        /* === BULLETPROOF BACKGROUND LAYER === */
+        #bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: linear-gradient(to bottom, rgba(5,5,5,0.7), rgba(5,5,5,0.95)), 
+                              url('https://i.ibb.co/5xYYQPWB/areth-adl-kullan-c-n-n-wallpapers-panosundaki-Pin-2025.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* === VIEW 1: THE GATEWAY === */
+        #gateway-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent;
+            z-index: 100;
+            transition: opacity 0.6s ease-in-out, visibility 0.6s;
+            padding: 1rem;
+        }
+
+        .gateway-content {
+            text-align: center;
+            background: rgba(0,0,0,0.7);
+            padding: 4rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            width: 100%;
+            max-width: 800px; /* Widened slightly for the big title */
+        }
+
+        /* Original Gradient Heading */
+        .splash-title {
+            font-size: 5.5rem;
+            letter-spacing: 8px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 3s infinite;
+            text-transform: uppercase;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .author-name {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            color: #cccccc;
+        }
+
+        .pen-name {
+            font-size: 1.1rem;
+            color: #999999;
+            margin-bottom: 3rem;
+        }
+
+        .enter-btn {
+            background: linear-gradient(45deg, #ff0f47, var(--accent));
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--accent-glow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            z-index: 101;
+        }
+
+        .enter-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .ig-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .ig-link:hover {
+            color: white;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* === VIEW 2 & 3: MAIN CATALOG & DETAILS === */
+        #manga-catalog, #manga-details {
+            display: none;
+            opacity: 0;
+            padding-top: 100px;
+            animation: fadeUp 0.8s forwards;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 50;
+            border-bottom: 1px solid rgba(255, 42, 95, 0.2);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--accent-glow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-logo a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: transparent;
+            color: white;
+            border: 1px solid var(--accent);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            background: var(--accent);
+        }
+
+        /* Section Layouts */
+        section {
+            padding: 2rem 5% 5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+        }
+
+        /* Manga Card */
+        .manga-card {
+            display: flex;
+            background: rgba(18, 18, 18, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255, 42, 95, 0.2);
+            align-items: center;
+            transition: transform 0.4s;
+        }
+
+        .manga-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 40px rgba(255, 42, 95, 0.15);
+        }
+
+        .manga-img-container {
+            width: 40%;
+            min-height: 450px;
+            border-right: 2px solid var(--accent);
+            overflow: hidden;
+        }
+
+        .manga-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .manga-info {
+            padding: 3rem;
+            width: 60%;
+        }
+
+        .manga-title {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .manga-quote {
+            font-style: italic;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Chapters Grid */
+        .chapter-card {
+            background: rgba(18, 18, 18, 0.85);
+            padding: 1.5rem 2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(8px);
+            transition: transform 0.3s;
+        }
+
+        .chapter-card:hover {
+            transform: translateX(10px);
+            background: rgba(30, 30, 30, 0.95);
+        }
+
+        /* Platforms Grid */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .platform-card {
+            background: rgba(18, 18, 18, 0.85);
+            padding: 2.5rem 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 42, 95, 0.2);
+            backdrop-filter: blur(8px);
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+
+        .platform-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 42, 95, 0.2);
+        }
+
+        .read-btn {
+            background: var(--accent);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: box-shadow 0.3s;
+        }
+        
+        .read-btn:hover {
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .coming-soon {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            cursor: default;
+        }
+        
+        .coming-soon:hover {
+            box-shadow: none;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === MOBILE OPTIMIZATION === */
+        @media (max-width: 768px) {
+            /* Hide custom cursor on touch devices */
+            #cursor-glow {
+                display: none !important;
+            }
+
+            .gateway-content {
+                padding: 2.5rem 1.5rem;
+            }
+            .splash-title {
+                font-size: 3.5rem; /* Scaled for mobile */
+                letter-spacing: 4px;
+            }
+            .author-name {
+                font-size: 1.5rem;
+            }
+            .pen-name {
+                font-size: 0.9rem;
+                margin-bottom: 2rem;
+            }
+            .enter-btn {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .manga-card { flex-direction: column; }
+            .manga-img-container { width: 100%; min-height: 300px; border-right: none; border-bottom: 2px solid var(--accent); }
+            .manga-info { width: 100%; padding: 1.5rem; }
+            .manga-title { font-size: 2.2rem; }
+            
+            .chapter-card { 
+                padding: 1rem 1.2rem;
+                flex-direction: row; 
+                text-align: left;
+                gap: 0.5rem;
+            }
+            .chapter-card h3 { font-size: 1.2rem !important; margin-bottom: 0 !important; }
+            .chapter-card p { font-size: 0.85rem; }
+            .chapter-card .read-btn { padding: 0.5rem 1rem; font-size: 0.85rem; white-space: nowrap; }
+
+            .nav-logo { font-size: 1.2rem; }
+            .platform-card { padding: 1.5rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cursor-glow"></div>
+
+    <div id="bg-layer"></div>
+
+    <div id="gateway-screen">
+        <div class="gateway-content" id="gateway-content">
+            <h1 class="splash-title">DOMINION</h1>
+            <h2 class="author-name">Karna Debnath</h2>
+            <p class="pen-name">Pen Name : KarnaTheMangaka</p>
+            <button class="enter-btn" onclick="enterWorld()">Enter The World</button>
+            <br>
+            <a href="https://www.instagram.com/karna.themangaka?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="ig-link">@karna.themangaka on Instagram</a>
+        </div>
+    </div>
+
+    <nav>
+        <div class="nav-logo">
+            KarnaTheMangaka
+            <a href="https://www.instagram.com/karna.themangaka?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+        </div>
+        <button class="back-btn" id="back-btn" onclick="backToCatalog()">Back to Catalog</button>
+    </nav>
+
+    <div id="manga-catalog">
+        <section>
+            <h2 class="section-title">Official Works</h2>
+            
+            <div class="manga-card">
+                <div class="manga-img-container">
+                    <img src="https://i.ibb.co/x8qV1bNH/Manga-Cover-page-1.png" alt="DOMINION Cover">
+                </div>
+                <div class="manga-info">
+                    <h3 class="manga-title">DOMINION</h3>
+                    <p class="manga-quote">"Power hides the truth."</p>
+                    <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
+                        A dark psychological mystery manga created by Karna Debnath. Enter a world of manipulation, secrets, fear, and hidden power.
+                    </p>
+                    <button onclick="viewMangaDetails()" class="read-btn" style="width: 100%; text-align: center;">Access Chapters</button>
+                </div>
+            </div>
+            
+        </section>
+    </div>
+
+    <div id="manga-details">
+        <section id="chapters">
+            <h2 class="section-title">Dominion: Chapters</h2>
+            
+            <div class="chapter-card">
+                <div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.3rem; color: white;">Chapter 0</h3>
+                    <p style="color: var(--text-muted);">Behind The Applause.</p>
+                </div>
+                <span class="read-btn coming-soon">Coming soon</span>
+            </div>
+            
+        </section>
+
+        <section id="platforms">
+            <h2 class="section-title">Reading Platforms</h2>
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <h3 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 1rem;">TRIO</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Official reading section for DOMINION.</p>
+                    <span class="read-btn coming-soon">Coming Soon</span>
+                </div>
+                <div class="platform-card">
+                    <h3 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 1rem;">Manga Plus</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Creator Platform.</p>
+                    <span class="read-btn coming-soon">Available Soon</span>
+                </div>
+                <div class="platform-card">
+                    <h3 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 1rem;">WEBTOON</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Canvas Platform.</p>
+                    <span class="read-btn coming-soon">Available Soon</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // === Premium Mouse Tracker Logic ===
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        document.addEventListener('mousemove', (e) => {
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+        });
+
+        // Add a nice expanding pulse effect when clicking
+        document.addEventListener('mousedown', () => {
+            cursorGlow.style.width = '500px';
+            cursorGlow.style.height = '500px';
+            cursorGlow.style.background = 'radial-gradient(circle, rgba(255, 42, 95, 0.25) 0%, rgba(0,0,0,0) 60%)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursorGlow.style.width = '400px';
+            cursorGlow.style.height = '400px';
+            cursorGlow.style.background = 'radial-gradient(circle, rgba(255, 42, 95, 0.12) 0%, rgba(0,0,0,0) 60%)';
+        });
+
+        // === View Transition Logic ===
+        const gateway = document.getElementById('gateway-screen');
+        const catalog = document.getElementById('manga-catalog');
+        const details = document.getElementById('manga-details');
+        const backBtn = document.getElementById('back-btn');
+
+        function enterWorld() {
+            document.getElementById('gateway-content').style.opacity = '0';
+            
+            setTimeout(() => {
+                gateway.style.display = 'none';
+                catalog.style.display = 'block';
+                catalog.style.opacity = '1';
+                window.scrollTo(0, 0);
+            }, 500); 
+        }
+
+        function viewMangaDetails() {
+            catalog.style.display = 'none';
+            catalog.style.opacity = '0';
+            
+            details.style.display = 'block';
+            details.style.opacity = '1';
+            
+            backBtn.style.display = 'block'; 
+            window.scrollTo(0, 0);
+        }
+
+        function backToCatalog() {
+            details.style.display = 'none';
+            details.style.opacity = '0';
+            
+            catalog.style.display = 'block';
+            catalog.style.opacity = '1';
+            
+            backBtn.style.display = 'none'; 
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
