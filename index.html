@@ -28,7 +28,7 @@
             color: var(--text-main);
             overflow-x: hidden;
             height: 100%;
-            cursor: default; /* Prep for custom glow */
+            cursor: default; 
         }
 
         /* === PREMIUM MOUSE TRACKER === */
@@ -40,7 +40,7 @@
             height: 400px;
             background: radial-gradient(circle, rgba(255, 42, 95, 0.12) 0%, rgba(0,0,0,0) 60%);
             border-radius: 50%;
-            pointer-events: none; /* Let clicks pass through */
+            pointer-events: none; 
             transform: translate(-50%, -50%);
             z-index: 9999;
             transition: width 0.2s, height 0.2s, background 0.2s;
@@ -89,19 +89,20 @@
             backdrop-filter: blur(12px);
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
             width: 100%;
-            max-width: 800px; /* Widened slightly for the big title */
+            max-width: 800px; 
         }
 
-        /* Original Gradient Heading */
-        .splash-title {
-            font-size: 5.5rem;
-            letter-spacing: 8px;
-            margin-bottom: 1.5rem;
+        /* Gradient Author Name */
+        .author-name {
+            font-size: 4.5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
             background: linear-gradient(to right, #ffffff, var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: pulse 3s infinite;
-            text-transform: uppercase;
         }
 
         @keyframes pulse {
@@ -110,18 +111,11 @@
             100% { transform: scale(1); }
         }
 
-        .author-name {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-            color: #cccccc;
-        }
-
         .pen-name {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: #999999;
             margin-bottom: 3rem;
+            letter-spacing: 2px;
         }
 
         .enter-btn {
@@ -363,7 +357,6 @@
 
         /* === MOBILE OPTIMIZATION === */
         @media (max-width: 768px) {
-            /* Hide custom cursor on touch devices */
             #cursor-glow {
                 display: none !important;
             }
@@ -371,15 +364,12 @@
             .gateway-content {
                 padding: 2.5rem 1.5rem;
             }
-            .splash-title {
-                font-size: 3.5rem; /* Scaled for mobile */
-                letter-spacing: 4px;
-            }
             .author-name {
-                font-size: 1.5rem;
+                font-size: 2.8rem; /* Scaled down slightly to fit on phones */
+                letter-spacing: 2px;
             }
             .pen-name {
-                font-size: 0.9rem;
+                font-size: 1rem;
                 margin-bottom: 2rem;
             }
             .enter-btn {
@@ -415,8 +405,7 @@
 
     <div id="gateway-screen">
         <div class="gateway-content" id="gateway-content">
-            <h1 class="splash-title">DOMINION</h1>
-            <h2 class="author-name">Karna Debnath</h2>
+            <h1 class="author-name">Karna Debnath</h1>
             <p class="pen-name">Pen Name : KarnaTheMangaka</p>
             <button class="enter-btn" onclick="enterWorld()">Enter The World</button>
             <br>
@@ -504,7 +493,6 @@
             cursorGlow.style.top = e.clientY + 'px';
         });
 
-        // Add a nice expanding pulse effect when clicking
         document.addEventListener('mousedown', () => {
             cursorGlow.style.width = '500px';
             cursorGlow.style.height = '500px';
