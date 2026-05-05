@@ -28,6 +28,23 @@
             color: var(--text-main);
             overflow-x: hidden;
             height: 100%;
+            cursor: default; /* Prep for custom glow */
+        }
+
+        /* === PREMIUM MOUSE TRACKER === */
+        #cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 42, 95, 0.12) 0%, rgba(0,0,0,0) 60%);
+            border-radius: 50%;
+            pointer-events: none; /* Let clicks pass through */
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            mix-blend-mode: screen;
         }
 
         /* === BULLETPROOF BACKGROUND LAYER === */
@@ -51,8 +68,8 @@
             top: 0;
             left: 0;
             width: 100vw;
-            height: 100vh; /* Fits exactly one screen */
-            height: 100dvh; /* Fix for mobile browser UI bars */
+            height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -72,23 +89,39 @@
             backdrop-filter: blur(12px);
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
             width: 100%;
-            max-width: 600px;
+            max-width: 800px; /* Widened slightly for the big title */
+        }
+
+        /* Original Gradient Heading */
+        .splash-title {
+            font-size: 5.5rem;
+            letter-spacing: 8px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 3s infinite;
+            text-transform: uppercase;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
 
         .author-name {
-            font-size: 3.5rem;
-            font-weight: 900;
-            letter-spacing: 4px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
             margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(255, 42, 95, 0.5);
+            color: #cccccc;
         }
 
         .pen-name {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            margin-bottom: 2.5rem;
-            letter-spacing: 2px;
+            font-size: 1.1rem;
+            color: #999999;
+            margin-bottom: 3rem;
         }
 
         .enter-btn {
@@ -106,6 +139,8 @@
             letter-spacing: 1px;
             width: 100%;
             max-width: 300px;
+            position: relative;
+            z-index: 101;
         }
 
         .enter-btn:hover {
@@ -215,6 +250,12 @@
             transition: transform 0.4s;
         }
 
+        .manga-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 40px rgba(255, 42, 95, 0.15);
+        }
+
         .manga-img-container {
             width: 40%;
             min-height: 450px;
@@ -256,6 +297,12 @@
             align-items: center;
             margin-bottom: 1rem;
             backdrop-filter: blur(8px);
+            transition: transform 0.3s;
+        }
+
+        .chapter-card:hover {
+            transform: translateX(10px);
+            background: rgba(30, 30, 30, 0.95);
         }
 
         /* Platforms Grid */
@@ -272,6 +319,12 @@
             text-align: center;
             border: 1px solid rgba(255, 42, 95, 0.2);
             backdrop-filter: blur(8px);
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+
+        .platform-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 42, 95, 0.2);
         }
 
         .read-btn {
@@ -285,6 +338,11 @@
             border: none;
             cursor: pointer;
             font-size: 1rem;
+            transition: box-shadow 0.3s;
+        }
+        
+        .read-btn:hover {
+            box-shadow: 0 0 15px var(--accent-glow);
         }
 
         .coming-soon {
@@ -292,6 +350,10 @@
             border: 1px solid var(--accent);
             color: var(--accent);
             cursor: default;
+        }
+        
+        .coming-soon:hover {
+            box-shadow: none;
         }
 
         @keyframes fadeUp {
@@ -301,15 +363,23 @@
 
         /* === MOBILE OPTIMIZATION === */
         @media (max-width: 768px) {
-            /* Fix gateway spacing to fit in one screen */
+            /* Hide custom cursor on touch devices */
+            #cursor-glow {
+                display: none !important;
+            }
+
             .gateway-content {
                 padding: 2.5rem 1.5rem;
             }
+            .splash-title {
+                font-size: 3.5rem; /* Scaled for mobile */
+                letter-spacing: 4px;
+            }
             .author-name {
-                font-size: 2.2rem;
+                font-size: 1.5rem;
             }
             .pen-name {
-                font-size: 1rem;
+                font-size: 0.9rem;
                 margin-bottom: 2rem;
             }
             .enter-btn {
@@ -317,61 +387,37 @@
                 font-size: 1rem;
             }
             
-            /* Manga Card Stacking */
-            .manga-card { 
-                flex-direction: column; 
-            }
-            .manga-img-container { 
-                width: 100%; 
-                min-height: 300px; 
-                border-right: none; 
-                border-bottom: 2px solid var(--accent); 
-            }
-            .manga-info { 
-                width: 100%; 
-                padding: 1.5rem; 
-            }
-            .manga-title {
-                font-size: 2.2rem;
-            }
+            .manga-card { flex-direction: column; }
+            .manga-img-container { width: 100%; min-height: 300px; border-right: none; border-bottom: 2px solid var(--accent); }
+            .manga-info { width: 100%; padding: 1.5rem; }
+            .manga-title { font-size: 2.2rem; }
             
-            /* Sleek Rectangular Chapter Cards for Mobile */
             .chapter-card { 
                 padding: 1rem 1.2rem;
-                flex-direction: row; /* Forces it to stay rectangular */
+                flex-direction: row; 
                 text-align: left;
                 gap: 0.5rem;
             }
-            .chapter-card h3 {
-                font-size: 1.2rem !important; /* Smaller title */
-                margin-bottom: 0 !important;
-            }
-            .chapter-card p {
-                font-size: 0.85rem;
-            }
-            .chapter-card .read-btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
-                white-space: nowrap;
-            }
+            .chapter-card h3 { font-size: 1.2rem !important; margin-bottom: 0 !important; }
+            .chapter-card p { font-size: 0.85rem; }
+            .chapter-card .read-btn { padding: 0.5rem 1rem; font-size: 0.85rem; white-space: nowrap; }
 
-            .nav-logo {
-                font-size: 1.2rem;
-            }
-            .platform-card {
-                padding: 1.5rem 1rem;
-            }
+            .nav-logo { font-size: 1.2rem; }
+            .platform-card { padding: 1.5rem 1rem; }
         }
     </style>
 </head>
 <body>
 
+    <div id="cursor-glow"></div>
+
     <div id="bg-layer"></div>
 
     <div id="gateway-screen">
         <div class="gateway-content" id="gateway-content">
-            <h1 class="author-name">Karna Debnath</h1>
-            <p class="pen-name">KarnaTheMangaka</p>
+            <h1 class="splash-title">DOMINION</h1>
+            <h2 class="author-name">Karna Debnath</h2>
+            <p class="pen-name">Pen Name : KarnaTheMangaka</p>
             <button class="enter-btn" onclick="enterWorld()">Enter The World</button>
             <br>
             <a href="https://www.instagram.com/karna.themangaka?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="ig-link">@karna.themangaka on Instagram</a>
@@ -406,7 +452,7 @@
                     <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
                         A dark psychological mystery manga created by Karna Debnath. Enter a world of manipulation, secrets, fear, and hidden power.
                     </p>
-                    <button onclick="viewMangaDetails()" class="read-btn" style="width: 100%; text-align: center; box-shadow: 0 0 15px var(--accent-glow);">Access Chapters</button>
+                    <button onclick="viewMangaDetails()" class="read-btn" style="width: 100%; text-align: center;">Access Chapters</button>
                 </div>
             </div>
             
@@ -450,6 +496,28 @@
     </div>
 
     <script>
+        // === Premium Mouse Tracker Logic ===
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        document.addEventListener('mousemove', (e) => {
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+        });
+
+        // Add a nice expanding pulse effect when clicking
+        document.addEventListener('mousedown', () => {
+            cursorGlow.style.width = '500px';
+            cursorGlow.style.height = '500px';
+            cursorGlow.style.background = 'radial-gradient(circle, rgba(255, 42, 95, 0.25) 0%, rgba(0,0,0,0) 60%)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursorGlow.style.width = '400px';
+            cursorGlow.style.height = '400px';
+            cursorGlow.style.background = 'radial-gradient(circle, rgba(255, 42, 95, 0.12) 0%, rgba(0,0,0,0) 60%)';
+        });
+
+        // === View Transition Logic ===
         const gateway = document.getElementById('gateway-screen');
         const catalog = document.getElementById('manga-catalog');
         const details = document.getElementById('manga-details');
